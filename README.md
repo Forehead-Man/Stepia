@@ -12,8 +12,8 @@ La selección de tecnologías está orientada a construir un sistema robusto, es
 
 - **Lenguaje:** Java 17+
 - **Framework Principal:** Spring Boot (Spring Web, Spring Security)
-- **Libreria principal:** Uber H3
-- **Base de Datos:** PostgreSQL + **PostGIS** (Extensión fundamental para el almacenamiento y cálculo eficiente de geometrías, polígonos y coordenadas geográficas).
+- **Base de Datos:** PostgreSQL (Ideal para la persistencia relacional de usuarios y relaciones de amistad).
+- **Indexación Geoespacial:** **Uber H3 (H3-Java)**. En lugar de procesar polígonos tradicionales pesados, se utiliza el sistema de celdas hexagonales de Uber para discretizar el mapa mundial. Esto permite que el cálculo de áreas exploradas se reduzca a operaciones de conjuntos sumamente eficientes.
 - **Persistencia/ORM:** Spring Data JPA / Hibernate.
 - **Autenticación:** JSON Web Tokens (JWT) para una arquitectura REST stateless.
 - **Gestor de Dependencias:** Gradle.
@@ -35,9 +35,9 @@ El backend se estructurará siguiendo los principios de la **Arquitectura Multic
 Para soportar las funcionalidades de gamificación y geolocalización, se definieron las siguientes entidades core:
 
 - **User:** ID, username, email, password (hashed), total_score, created_at.
-- **City:** ID, name, geometry (Polígono que define los límites oficiales de la ciudad).
-- **UserProgress:** ID, user_id, city_id, percentage_explored (Calculado dinámicamente mediante la intersección de rutas del usuario con el polígono de la ciudad).
-- **Route/Track:** ID, user_id, line_string (Conjunto ordenado de coordenadas GPS registradas por el usuario), distance, created_at.
+- **City:** ID, name, bounding_box_coordinates.
+- **ExploredCell (H3 Indexes):** user_id, h3_index (String/Long representando el hexágono visitado, típicamente en resolución 8 o 9 para precisión a nivel de calles), visited_at.
+- **UserProgress:** ID, user_id, city_id, percentage_explored (Calculado de manera eficiente dividiendo la cantidad de `h3_index` únicos del usuario dentro de la ciudad sobre el total de hexágonos que componen la ciudad completa).
 - **Friendship:** ID, user_id_1, user_id_2, status (PENDING, ACCEPTED).
 
 ---
@@ -66,5 +66,5 @@ A continuación se detallan los principales endpoints diseñados para la comunic
 
 1. [ ] Inicialización del proyecto base con Spring Initializr y configuración del contenedor Docker para PostgreSQL + PostGIS.
 2. [ ] Implementación del módulo de usuarios, seguridad con JWT y migraciones de base de datos básicas.
-3. [ ] Desarrollo de la lógica matemática en base de datos para calcular la intersección entre las líneas de ruta (`LineString`) y los polígonos de las ciudades (`Polygon`).
-4. [ ] Creación de los servicios de Leaderboards dinámicos.
+3. [ ] Integración de la librería `h3-java` para convertir las coordenadas GPS (`latitude, longitude`) recibidas en tiempo real a sus respectivos índices hexagonales H3.
+4. [ ] Desarrollo de la lógica de negocio para la agregación de hexágonos descubiertos y actualización óptima de los leaderboards compartidos.
