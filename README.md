@@ -16,7 +16,7 @@ La selección de tecnologías está orientada a construir un sistema robusto, es
 - **Indexación Geoespacial:** **Uber H3 (H3-Java)**. En lugar de procesar polígonos tradicionales pesados, se utiliza el sistema de celdas hexagonales de Uber para discretizar el mapa mundial. Esto permite que el cálculo de áreas exploradas se reduzca a operaciones de conjuntos sumamente eficientes.
 - **Persistencia/ORM:** Spring Data JPA / Hibernate.
 - **Autenticación:** JSON Web Tokens (JWT) para una arquitectura REST stateless.
-- **Gestor de Dependencias:** Gradle.
+- **Gestor de Dependencias:** Gradle o Maven.
 
 ---
 
@@ -27,6 +27,8 @@ El backend se estructurará siguiendo los principios de la **Arquitectura Multic
 1. **API/Controller Layer:** Exposición de endpoints RESTful en formato JSON.
 2. **Service Layer:** Contendrá la lógica de negocio principal (cálculo de porcentajes de ciudades exploradas, validación de rutas cruzando datos con los límites de la ciudad, y procesamiento de rankings).
 3. **Repository/Data Access Layer:** Consultas optimizadas a la base de datos relacional aprovechando los índices espaciales de PostGIS.
+
+Se implementará una base de datos local de manera que se pueda optimizar el almacenamiento de datos en dispositivo para que, una vez conectados a internet/datos móviles, se sincronicen los datos de gps recorridos con la base de datos general.
 
 ---
 
